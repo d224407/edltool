@@ -162,7 +162,15 @@ edl --portname \\.\COM1
 ------------------------------------------------------------------------------------------------------------------------------------
 ## Get Loaders
 You should get these automatically if you do a ``` git submodule update --init --recursive ```
-or from [here](https://github.com/bkerler/Loaders)
+or from [here](https://github.com/d224407/Loaders)
+
+## GUI
+
+- ```python edl_gui.py``` (cần tkinter, chạy trên Windows/Linux có màn hình)
+
+## Lọc Loaders
+
+- ```python filter_loaders.py <Loaders_gốc> <thư_mục_đích> [--dedupe] [--dry-run]``` -> chỉ giữ loader mà edl nhận ra
 
 ## Convert own EDL loaders for automatic usage
 
