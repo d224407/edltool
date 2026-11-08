@@ -166,11 +166,11 @@ or from [here](https://github.com/d224407/Loaders)
 
 ## GUI
 
-- ```python edl_gui.py``` (cần tkinter, chạy trên Windows/Linux có màn hình)
+- ```python edl_gui.py``` (needs tkinter; Windows/Linux desktop). English/Vietnamese switch at the bottom right.
 
-## Lọc Loaders
+## Filter Loaders
 
-- ```python filter_loaders.py <Loaders_gốc> <thư_mục_đích> [--dedupe] [--dry-run]``` -> chỉ giữ loader mà edl nhận ra
+- ```python filter_loaders.py <source_Loaders_dir> <destination_dir> [--dedupe] [--dry-run]``` -> keep only the loaders edl recognizes
 
 ## Convert own EDL loaders for automatic usage
 

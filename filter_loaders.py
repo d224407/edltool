@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Lọc Loaders: chỉ giữ những file mà edl nhận ra.
+Filter a Loaders folder: keep only the files that edl recognizes.
 
-"Nhận ra" dùng đúng logic của loader_db.init_loader_db:
-  - đuôi .bin / .mbn / .elf
-  - tên dạng <hwid>_<pkhash>...  (hwid = msmid 8 ký tự + devid, devid không rỗng)
-  - msmid map được qua convertmsmid (đuôi e1 hoặc có trong bảng sochw/msmids)
+"Recognized" uses the same rules as loader_db.init_loader_db:
+  - extension is .bin / .mbn / .elf
+  - name looks like <hwid>_<pkhash>... (hwid = 8 char msmid + non-empty devid)
+  - msmid can be mapped by convertmsmid (ends with e1, or is in sochw/msmids)
 
-Dùng:
-  python filter_loaders.py <thư_mục_Loaders_gốc> <thư_mục_đích> [--dedupe] [--dry-run]
+Usage:
+  python filter_loaders.py <source_Loaders_dir> <destination_dir> [--dedupe] [--dry-run]
 
-  --dedupe   chỉ giữ 1 file cho mỗi cặp (hwid, pkhash); edl chỉ dùng file đầu tiên
-             của mỗi cặp, các file còn lại (vd. biến thể _peek, _EDLAuth) sẽ bị bỏ
-  --dry-run  chỉ in kết quả, không copy
+  --dedupe   keep one file per (hwid, pkhash) pair. edl only uses the first file of
+             each pair, so variants such as _peek or _EDLAuth are dropped.
+  --dry-run  only print what would be kept, copy nothing.
 """
 import argparse
 import logging
@@ -29,7 +29,7 @@ EXTS = (".bin", ".mbn", ".elf")
 
 
 def keys_for(filename, lu):
-    """Danh sách (hwid, pkhash) mà edl sẽ đăng ký cho file này; rỗng nếu không nhận ra."""
+    """(hwid, pkhash) pairs edl would register for this file; empty if not recognized."""
     if not filename.endswith(EXTS):
         return []
     try:
@@ -47,7 +47,7 @@ def keys_for(filename, lu):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Giữ lại những loader mà edl nhận ra")
+    ap = argparse.ArgumentParser(description="Keep only the loaders that edl recognizes")
     ap.add_argument("src")
     ap.add_argument("dst")
     ap.add_argument("--dedupe", action="store_true")
@@ -55,9 +55,9 @@ def main():
     a = ap.parse_args()
 
     if not os.path.isdir(a.src):
-        sys.exit("Không thấy thư mục nguồn: %s" % a.src)
+        sys.exit("Source folder not found: %s" % a.src)
     if os.path.abspath(a.src) == os.path.abspath(a.dst):
-        sys.exit("Nguồn và đích phải khác nhau")
+        sys.exit("Source and destination must be different")
 
     lu = loader_utils(logging.ERROR)
     seen = set()
@@ -82,14 +82,14 @@ def main():
             size_kept += size
             rel = os.path.relpath(path, a.src)
             if a.dry_run:
-                print("giữ:", rel)
+                print("keep:", rel)
                 continue
             out = os.path.join(a.dst, rel)
             os.makedirs(os.path.dirname(out), exist_ok=True)
             shutil.copy2(path, out)
 
     mb = 1024 * 1024
-    print("Tổng %d file (%.1f MB) | nhận ra %d | giữ %d (%.1f MB)%s" % (
+    print("Total %d files (%.1f MB) | recognized %d | kept %d (%.1f MB)%s" % (
         total, size_all / mb, recognized, kept, size_kept / mb, " [dry-run]" if a.dry_run else ""))
 
 
